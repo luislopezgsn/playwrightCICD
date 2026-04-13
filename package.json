@@ -1,0 +1,22 @@
+{
+  "name": "playwrightcicd",
+  "version": "1.0.0",
+  "description": "repo to learn about playwright and CICD integration",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luislopezgsn/playwrightCICD.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/luislopezgsn/playwrightCICD/issues"
+  },
+  "homepage": "https://github.com/luislopezgsn/playwrightCICD#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0"
+  }
+}
