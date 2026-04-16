@@ -7,6 +7,8 @@ function App() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: '', password: '', remember: false });
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [dialogResult, setDialogResult] = useState('');
+  const [selectedOption, setSelectedOption] = useState('');
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -129,6 +131,59 @@ function App() {
               <a href="#" className="dropdown-item" id="menu-action-2">Account Billing</a>
               <a href="#" className="dropdown-item" id="menu-action-3">System Logout</a>
             </div>
+          </div>
+        </section>
+
+        {/* Challenge 5: Browser Dialogs */}
+        <section className="card" id="dialog-section">
+          <h2>5. Native Dialogs</h2>
+          <p className="hint">Practice handling window.confirm or window.alert events.</p>
+
+          <button
+            className="button danger-btn"
+            id="trigger-confirm-btn"
+            onClick={() => {
+              const res = window.confirm('Are you sure you want to delete this?');
+              setDialogResult(res ? 'Confirmed' : 'Cancelled');
+            }}
+          >
+            Trigger Confirm
+          </button>
+
+          <div className="data-box" style={{ marginTop: '1rem' }} id="dialog-result">
+            <p>Result: <strong id="dialog-status">{dialogResult || 'None'}</strong></p>
+          </div>
+        </section>
+
+        {/* Challenge 6: Select Dropdown */}
+        <section className="card" id="select-section">
+          <h2>6. Select Dropdowns</h2>
+          <p className="hint">Practice using locator.selectOption() to choose from a list.</p>
+
+          <div className="input-group">
+            <label htmlFor="color-select">Favorite Color</label>
+            <select
+              id="color-select"
+              value={selectedOption}
+              onChange={(e) => setSelectedOption(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '0.625rem',
+                borderRadius: '0.5rem',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-dark)',
+                color: 'var(--text-primary)'
+              }}
+            >
+              <option value="">-- Please choose an option --</option>
+              <option value="red" id="option-red">Red</option>
+              <option value="blue" id="option-blue">Blue</option>
+              <option value="green" id="option-green">Green</option>
+            </select>
+          </div>
+
+          <div className="data-box" style={{ marginTop: '1rem' }}>
+            <p>Selected: <strong id="select-result">{selectedOption || 'None'}</strong></p>
           </div>
         </section>
       </main>
