@@ -76,5 +76,36 @@ test.describe('Sandbox Challenge Tests', () => {
         const action1 = page.locator('#menu-action-1');
         await expect(action1).toHaveText('Profile Settings');
     });
+    test('Challenge 5: Dialog and Alert Handling', async ({ page }) => {
+        // Playwright auto-dismisses dialogs by default! 
+        // We have to explicitly set up a listener to accept or assert the dialog.
+        page.on('dialog', async dialog => {
+            expect(dialog.message()).toBe('Are you sure you want to delete this?');
+            await dialog.accept();
+        });
+
+        // Click the button that triggers window.confirm
+        await page.locator('#trigger-confirm-btn').click();
+
+        // Check if our state updated based on accepting the dialog!
+        await expect(page.locator('#dialog-status')).toHaveText('Confirmed');
+    });
+
+    test('Challenge 6: Select Dropdown', async ({ page }) => {
+        const selectBox = page.locator('#color-select');
+
+        // Assert initial state
+        await expect(page.locator('#select-result')).toHaveText('None');
+
+        // Select the "blue" option using value
+        await selectBox.selectOption('blue');
+
+        // Assert state correctly mapped it
+        await expect(page.locator('#select-result')).toHaveText('blue');
+
+        // Select using label explicitly
+        await selectBox.selectOption({ label: 'Green' });
+        await expect(page.locator('#select-result')).toHaveText('green');
+    });
 
 });
