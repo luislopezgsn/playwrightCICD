@@ -4,6 +4,12 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+
 jobs:
   test:
     timeout-minutes: 60
@@ -21,9 +27,6 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npm run test
-    - name: Generate Allure Report
-      if: always()
-      run: npx allure generate ./allure-results --clean
     - name: Upload Playwright HTML Report
       uses: actions/upload-artifact@v4
       if: always()
@@ -31,10 +34,8 @@ jobs:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
-    - name: Upload Allure HTML Report
-      uses: actions/upload-artifact@v4
+    - name: Publish Test Results to GitHub Summary
+      uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        name: allure-report
-        path: allure-report/
-        retention-days: 30
+        files: test-results/**/*.xml
