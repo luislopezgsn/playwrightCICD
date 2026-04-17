@@ -92,3 +92,26 @@ test.describe('Sandbox Challenge Tests (POM Architecture)', () => {
         await expect(sandbox.selectResult).toHaveText('green');
     });
 });
+
+test.describe('Sandbox Visual Regression', () => {
+    let sandbox: SandboxPage;
+
+    test.beforeEach(async ({ page }) => {
+        sandbox = new SandboxPage(page);
+        await sandbox.goto();
+    });
+
+    test('should match the full page snapshot', async ({ page }) => {
+        // This will take a screenshot and compare it against the golden baseline
+        // If the baseline doesn't exist, it will create it on the first run.
+        await expect(page).toHaveScreenshot('landing-page.png', {
+            fullPage: true,
+            maxDiffPixels: 100 // Allow for minor sub-pixel rendering differences
+        });
+    });
+
+    test('should match the login card component snapshot', async () => {
+        // You can also capture specific components instead of the whole page!
+        await expect(sandbox.loginForm).toHaveScreenshot('login-card.png');
+    });
+});
