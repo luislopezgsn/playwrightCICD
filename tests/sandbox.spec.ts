@@ -11,8 +11,12 @@ test.describe('Sandbox Challenge Tests (POM Architecture)', () => {
     });
 
     test('Challenge 1: Authentication Form', async ({ page }) => {
+        // Use credentials from environment variables
+        const email = process.env.TEST_USER_EMAIL || 'test@tester.com';
+        const password = process.env.TEST_USER_PASSWORD || 'password123';
+
         // Use our abstracted POM test helper
-        await sandbox.loginFully('test@tester.com', 'password123', true);
+        await sandbox.loginFully(email, password, true);
 
         // Assert success dynamically via the POM locators
         await expect(sandbox.welcomeMessage).toBeVisible();
