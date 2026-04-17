@@ -1,111 +1,94 @@
 import { test, expect } from '@playwright/test';
+import { SandboxPage } from '../pages/SandboxPage';
 
-test.describe('Sandbox Challenge Tests', () => {
+test.describe('Sandbox Challenge Tests (POM Architecture)', () => {
+    let sandbox: SandboxPage;
 
     test.beforeEach(async ({ page }) => {
-        await page.goto('/');
+        // Initialize our Page Object Model with the current browser page
+        sandbox = new SandboxPage(page);
+        await sandbox.goto();
     });
 
     test('Challenge 1: Authentication Form', async ({ page }) => {
-        // Fill credentials using ids
-        await page.locator('#email').fill('test@tester.com');
-        await page.locator('#password').fill('password123');
+        // Use our abstracted POM test helper
+        await sandbox.loginFully('test@tester.com', 'password123', true);
 
-        // Interact with checkbox
-        await page.locator('#remember-me').check();
-        await expect(page.locator('#remember-me')).toBeChecked();
-
-        // Submit and assert success state
-        await page.locator('#login-btn').click();
-        await expect(page.locator('#welcome-message')).toBeVisible();
-        await expect(page.locator('#welcome-message h3')).toHaveText('Welcome back!');
+        // Assert success dynamically via the POM locators
+        await expect(sandbox.welcomeMessage).toBeVisible();
+        await expect(sandbox.welcomeMessage.locator('h3')).toHaveText('Welcome back!');
 
         // Logout
-        await page.locator('#logout-btn').click();
-        await expect(page.locator('#login-form')).toBeVisible();
+        await sandbox.logoutButton.click();
+        await expect(sandbox.loginForm).toBeVisible();
     });
 
-    test('Challenge 2: Dynamic Elements Auto-waiting', async ({ page }) => {
-        const fetchBtn = page.locator('#load-data-btn');
-
-        // Start fetch
-        await fetchBtn.click();
+    test('Challenge 2: Dynamic Elements Auto-waiting', async () => {
+        // Start fetch seamlessly from the component function
+        await sandbox.fetchDynamicData();
 
         // Spinner should appear immediately
-        await expect(page.locator('#loading-spinner')).toBeVisible();
+        await expect(sandbox.loadingSpinner).toBeVisible();
 
-        // Playwright automatically waits for this logic to resolve up to the timeout.
-        // The spinner takes 2s, Playwright will just wait dynamically!
-        await expect(page.locator('#data-result')).toBeVisible({ timeout: 5000 });
-        await expect(page.locator('#data-result')).toContainText('Data successfully loaded from server.');
+        // Assert loaded state natively using the isolated locators
+        await expect(sandbox.dataResult).toBeVisible({ timeout: 5000 });
+        await expect(sandbox.dataResult).toContainText('Data successfully loaded from server.');
     });
 
-    test('Challenge 3: State Verification (Counter)', async ({ page }) => {
-        const counterValue = page.locator('#counter-value');
+    test('Challenge 3: State Verification (Counter)', async () => {
+        // Verify default state utilizing POM locators directly
+        await expect(sandbox.counterValue).toHaveText('0');
 
-        // Default is 0
-        await expect(counterValue).toHaveText('0');
+        // Execute DOM clicks intuitively
+        await sandbox.incrementButton.click();
+        await sandbox.incrementButton.click();
+        await expect(sandbox.counterValue).toHaveText('2');
 
-        // Click increase twice
-        await page.locator('#increment-btn').click();
-        await page.locator('#increment-btn').click();
-        await expect(counterValue).toHaveText('2');
+        await sandbox.decrementButton.click();
+        await expect(sandbox.counterValue).toHaveText('1');
 
-        // Click decrease once
-        await page.locator('#decrement-btn').click();
-        await expect(counterValue).toHaveText('1');
-
-        // Reset
-        await page.locator('#reset-btn').click();
-        await expect(counterValue).toHaveText('0');
+        await sandbox.resetButton.click();
+        await expect(sandbox.counterValue).toHaveText('0');
     });
 
-    test('Challenge 4: Hover Interactions', async ({ page }) => {
-        const dropdownMenu = page.locator('#dropdown-content');
+    test('Challenge 4: Hover Interactions', async () => {
+        // Hidden by default
+        await expect(sandbox.dropdownMenu).toBeHidden();
 
-        // Menu is hidden by default
-        await expect(dropdownMenu).toBeHidden();
+        // Playwright explicit hover event
+        await sandbox.dropdownTrigger.hover();
 
-        // Hover over the target
-        await page.locator('.dropdown-trigger').hover();
-
-        // Now it should be visible
-        await expect(dropdownMenu).toBeVisible();
-
-        // Click a menu item
-        const action1 = page.locator('#menu-action-1');
-        await expect(action1).toHaveText('Profile Settings');
+        // Exposed successfully
+        await expect(sandbox.dropdownMenu).toBeVisible();
+        await expect(sandbox.profileSettingsItem).toHaveText('Profile Settings');
     });
+
     test('Challenge 5: Dialog and Alert Handling', async ({ page }) => {
-        // Playwright auto-dismisses dialogs by default! 
-        // We have to explicitly set up a listener to accept or assert the dialog.
+        // We still need the page object to hook events
         page.on('dialog', async dialog => {
             expect(dialog.message()).toBe('Are you sure you want to delete this?');
             await dialog.accept();
         });
 
-        // Click the button that triggers window.confirm
-        await page.locator('#trigger-confirm-btn').click();
+        // Trigger leveraging the POM
+        await sandbox.triggerConfirmButton.click();
 
-        // Check if our state updated based on accepting the dialog!
-        await expect(page.locator('#dialog-status')).toHaveText('Confirmed');
+        // Verify state mutated upon acceptance
+        await expect(sandbox.dialogStatus).toHaveText('Confirmed');
     });
 
-    test('Challenge 6: Select Dropdown', async ({ page }) => {
-        const selectBox = page.locator('#color-select');
-
-        // Assert initial state
-        await expect(page.locator('#select-result')).toHaveText('None');
+    test('Challenge 6: Select Dropdown', async () => {
+        // Assert initial blank
+        await expect(sandbox.selectResult).toHaveText('None');
 
         // Select the "blue" option using value
-        await selectBox.selectOption('blue');
+        await sandbox.colorSelectBox.selectOption('blue');
 
         // Assert state correctly mapped it
-        await expect(page.locator('#select-result')).toHaveText('blue');
+        await expect(sandbox.selectResult).toHaveText('blue');
 
         // Select using label explicitly
-        await selectBox.selectOption({ label: 'Green' });
-        await expect(page.locator('#select-result')).toHaveText('green');
+        await sandbox.colorSelectBox.selectOption({ label: 'Green' });
+        await expect(sandbox.selectResult).toHaveText('green');
     });
-
 });
