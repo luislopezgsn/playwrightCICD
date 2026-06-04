@@ -36,6 +36,14 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
 
+  /* Global configuration for visual snapshots */
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.1, // Allow 10% pixel difference
+      threshold: 0.2,         // Sensitivity to color variation
+    },
+  },
+
   /* Configure projects for major browsers */
   projects: [
     {

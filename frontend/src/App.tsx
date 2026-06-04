@@ -9,6 +9,9 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [dialogResult, setDialogResult] = useState('');
   const [selectedOption, setSelectedOption] = useState('');
+  const [uploadedFileName, setUploadedFileName] = useState('');
+  const [dropSuccess, setDropSuccess] = useState(false);
+  const [apiUser, setApiUser] = useState('');
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,6 +187,87 @@ function App() {
 
           <div className="data-box" style={{ marginTop: '1rem' }}>
             <p>Selected: <strong id="select-result">{selectedOption || 'None'}</strong></p>
+          </div>
+        </section>
+
+        {/* Challenge 7: File Upload */}
+        <section className="card" id="upload-section">
+          <h2>7. File Upload</h2>
+          <p className="hint">Practice using locator.setInputFiles() to attach a file.</p>
+          <div className="input-group">
+            <label htmlFor="file-upload">Upload a File</label>
+            <input 
+              type="file" 
+              id="file-upload" 
+              onChange={(e) => setUploadedFileName(e.target.files?.[0]?.name || '')}
+              style={{ padding: '0.5rem 0', color: 'var(--text-primary)' }}
+            />
+          </div>
+          <div className="data-box" style={{ marginTop: '1rem', display: uploadedFileName ? 'block' : 'none' }}>
+            <p>Uploaded: <strong id="upload-result">{uploadedFileName}</strong></p>
+          </div>
+        </section>
+
+        {/* Challenge 8: Drag and Drop */}
+        <section className="card" id="dnd-section">
+          <h2>8. Drag and Drop</h2>
+          <p className="hint">Practice moving elements using locator.dragTo().</p>
+          <div className="dnd-container" style={{ display: 'flex', gap: '1.5rem', marginTop: '1rem' }}>
+            <div 
+              id="drag-source"
+              draggable
+              onDragStart={(e) => e.dataTransfer.setData('text/plain', 'dragged-item')}
+              style={{
+                width: '100px', height: '100px', background: 'var(--accent-primary)',
+                borderRadius: '0.5rem', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', cursor: 'grab', color: 'white', fontWeight: 600
+              }}
+            >
+              Drag Me
+            </div>
+            <div 
+              id="drop-target"
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (e.dataTransfer.getData('text/plain') === 'dragged-item') {
+                  setDropSuccess(true);
+                }
+              }}
+              style={{
+                width: '150px', height: '100px', border: '2px dashed var(--border-color)',
+                borderRadius: '0.5rem', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', background: dropSuccess ? 'rgba(16, 185, 129, 0.2)' : 'transparent',
+                borderColor: dropSuccess ? 'var(--success)' : 'var(--border-color)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              {dropSuccess ? 'Dropped!' : 'Drop Here'}
+            </div>
+          </div>
+        </section>
+
+        {/* Challenge 9: API Mocking */}
+        <section className="card" id="api-mock-section">
+          <h2>9. API Mocking</h2>
+          <p className="hint">Intercept network requests and mock responses.</p>
+          <button 
+            className="button tertiary-btn" 
+            id="fetch-users-btn"
+            onClick={async () => {
+              try {
+                const res = await fetch('https://jsonplaceholder.typicode.com/users/1');
+                const data = await res.json();
+                setApiUser(data.name);
+              } catch (e) {
+                setApiUser('Error loading user');
+              }
+            }}
+          >
+            Fetch Real User
+          </button>
+          <div className="data-box" style={{ marginTop: '1rem' }}>
+            <p>User: <strong id="api-user-result">{apiUser || 'None'}</strong></p>
           </div>
         </section>
       </main>

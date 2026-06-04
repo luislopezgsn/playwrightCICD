@@ -36,6 +36,18 @@ export class SandboxPage {
     readonly colorSelectBox: Locator;
     readonly selectResult: Locator;
 
+    // Challenge 7: File Upload
+    readonly fileUploadInput: Locator;
+    readonly uploadResult: Locator;
+
+    // Challenge 8: Drag and Drop
+    readonly dragSource: Locator;
+    readonly dropTarget: Locator;
+
+    // Challenge 9: API Mocking
+    readonly fetchUserButton: Locator;
+    readonly apiUserResult: Locator;
+
     constructor(page: Page) {
         this.page = page;
 
@@ -71,6 +83,18 @@ export class SandboxPage {
         // Select
         this.colorSelectBox = page.locator('#color-select');
         this.selectResult = page.locator('#select-result');
+
+        // Upload
+        this.fileUploadInput = page.locator('#file-upload');
+        this.uploadResult = page.locator('#upload-result');
+
+        // Drag & Drop
+        this.dragSource = page.locator('#drag-source');
+        this.dropTarget = page.locator('#drop-target');
+
+        // API Mocking
+        this.fetchUserButton = page.locator('#fetch-users-btn');
+        this.apiUserResult = page.locator('#api-user-result');
     }
 
     async goto() {

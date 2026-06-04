@@ -69,7 +69,7 @@ test.describe('Sandbox Challenge Tests (POM Architecture)', () => {
 
     test('Challenge 5: Dialog and Alert Handling', async ({ page }) => {
         // We still need the page object to hook events
-        page.on('dialog', async dialog => {
+        page.once('dialog', async dialog => {
             expect(dialog.message()).toBe('Are you sure you want to delete this?');
             await dialog.accept();
         });
@@ -94,6 +94,43 @@ test.describe('Sandbox Challenge Tests (POM Architecture)', () => {
         // Select using label explicitly
         await sandbox.colorSelectBox.selectOption({ label: 'Green' });
         await expect(sandbox.selectResult).toHaveText('green');
+    });
+
+    test('Challenge 7: File Upload', async () => {
+        // Provide the path to a dummy file to upload
+        await sandbox.fileUploadInput.setInputFiles('tests/dummy-upload.txt');
+        
+        // Assert the file name appears in the DOM
+        await expect(sandbox.uploadResult).toHaveText('dummy-upload.txt');
+    });
+
+    test('Challenge 8: Drag and Drop', async () => {
+        // Assert initial state
+        await expect(sandbox.dropTarget).toHaveText('Drop Here');
+
+        // Playwright utility for easy drag and drop
+        await sandbox.dragSource.dragTo(sandbox.dropTarget);
+
+        // Assert success state change
+        await expect(sandbox.dropTarget).toHaveText('Dropped!');
+    });
+
+    test('Challenge 9: Network Mocking (API Intercept)', async ({ page }) => {
+        // Intercept the outgoing API request from the frontend
+        await page.route('https://jsonplaceholder.typicode.com/users/1', async route => {
+            // Fulfill the request with our own MOCKED response!
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({ name: 'Playwright Mocked Agent' }),
+            });
+        });
+
+        // Trigger the request in UI
+        await sandbox.fetchUserButton.click();
+
+        // The UI should show our mocked text, NOT the real API response
+        await expect(sandbox.apiUserResult).toHaveText('Playwright Mocked Agent');
     });
 });
 
